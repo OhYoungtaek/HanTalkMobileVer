@@ -1,0 +1,2 @@
+serviceClass: com.hansol.hantalk.m.client.MHantalkService
+path: 79AA59390F89F328F323D8B08DC60B84.gwt.rpc

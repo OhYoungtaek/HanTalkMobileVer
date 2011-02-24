@@ -1,0 +1,144 @@
+
+.userImage { 
+	height: 5em;
+	width: 5em;
+	padding: 5px;
+}
+
+.bigUserImage{
+	height: 10em;
+	width: 10em;
+	padding: 5px;
+}
+.listGroupImage { 
+	height: 10em;
+	width: 10em;
+	padding: 5px;
+}
+
+.clickedPostTextBox{
+	width: 10em;
+	height: 20em;
+}
+.homeIcon{
+	width: 70px;
+	height: 60px;
+	cursor: pointer;
+	cursor: hand;
+}
+.iconImage{
+	width: 65px;
+	height: 55px;
+	cursor: pointer;
+	cursor: hand;
+}
+.extendButton{
+	width: 100%;
+	height: 30px;
+	background-color: cornflowerblue;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	cursor: hand;
+	border: 2px solid lightblue;
+}
+.loginTable{
+	margin: 10px; 
+	
+}
+.loginTable td{
+	text-align: center;
+	padding: 3px;
+}
+.loginField{
+	width: 100px;
+	border: 1px solid cornflowerblue;
+}
+.loginLabel{
+	text-size: 12pt;
+}
+.loginButton{
+	width: 160px;
+	align: center;
+	text-align: center;
+	cursor: pointer;
+	cursor: hand;
+	font-size: 10pt;
+	font-weight: bold;
+	color:white;
+	text-decoration:none;
+	display:block;
+	border:2px solid darkblue;
+	background-color: darkslateblue;
+}
+.loginLabel{
+	text-align: center;
+	align: center;
+	font-weight: bold;
+	font-family: ±¼¸²Ã¼;
+	color: darkblue;
+}
+.tempTable{
+	margin:15px;
+}
+.greenLabel{
+	color: green;
+}
+.blueLabel{
+	color: blue;
+	font-weight: bold;
+}
+.bar{
+	width: 100%;
+}
+
+.postTextBox{
+	width: 300px;
+	border: 2px solid mediumaquamarine;
+	color: gray;
+	margin-left: 6px;
+}
+.postButton{
+	width: 100px;
+	height: 25px;
+	color: white;
+	background-color: mediumaquamarine;
+	font-weight: bold;
+	border: 2px solid aliceblue;
+	cursor: pointer;
+	cursor: hand;
+	margin-left: 6px;
+}
+.postCancelButton{
+	width: 100px;
+	height: 25px;
+	color: white;
+	background-color: mediumaquamarine;
+	font-weight: bold;
+	border: 2px solid aliceblue;
+	cursor: pointer;
+	cursor: hand;
+	margin-right: 6px;
+}
+.postArea{
+	width: 300px;
+	height: 80px;
+	border: 2px solid mediumaquamarine;
+	margin-left: 6px;
+}
+
+.postLabel{
+	font-family: ±¼¸²Ã¼;
+}
+.groupNameLabel{
+	cursor: pointer;
+	cursor: hand;
+	font-weight: bold;
+	color: blue;
+}
+.hyperlink{
+	cursor: pointer;
+	cursor: hand;
+	color: blue;
+	text-decoration: underline;
+}

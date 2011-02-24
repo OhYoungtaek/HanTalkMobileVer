@@ -1,0 +1,3 @@
+# Module mhantalk
+# RPC service class, partial path of RPC policy file
+com.hansol.hantalk.m.client.MHantalkService, 79AA59390F89F328F323D8B08DC60B84.gwt.rpc
