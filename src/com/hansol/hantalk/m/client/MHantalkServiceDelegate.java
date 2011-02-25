@@ -20,6 +20,9 @@ public class MHantalkServiceDelegate {
 	private final native JsArray<Account> jsonAccountArray(String json) /*-{
 	  return eval(json);
 	}-*/;
+	private final native JsArray<ChartList> jsonChartListArray(String json) /*-{
+	  return eval(json);
+	}-*/;
 	
 	void login(final String id, String pwd) throws Exception {
 		
@@ -129,16 +132,78 @@ public class MHantalkServiceDelegate {
 		});
 	}
 	
-	void post(String session, final String group, String text, String parent, String via,
+	void post(String session, final String group, String text, final String parent, String via,
 			final VerticalPanel panel) throws Exception {
 		mHantalkService.post(session, group, text, parent, via, new AsyncCallback<String>() {
 			public void onSuccess(String result) {
-				gui.service_Post(jsonTimelineArray(result), true, group, panel);
+				if ( parent.equals("-1"))
+					gui.service_Post(jsonTimelineArray(result), false, group, panel);
+				else 
+					gui.service_Post(jsonTimelineArray(result), true, group, panel);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				caught.printStackTrace();
+			}
+		});
+	}
+	
+	void getChartList(String session, final String chart_kind, String period,
+			final VerticalPanel listPanel, final VerticalPanel replyPanel) throws Exception {
+		mHantalkService.getChartList(session, chart_kind, period, new AsyncCallback<String>() {
+			
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				gui.service_CharList(jsonChartListArray(result), chart_kind, listPanel,replyPanel);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				caught.printStackTrace();
+			}
+		});
+	}
+	
+	void getPost(String session, final String post_id, final VerticalPanel listPanel, final VerticalPanel replyPanel) throws Exception {
+		mHantalkService.getPost(session, post_id, new AsyncCallback<String>() {
+			
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				System.out.println(result);
+				System.out.println("getpostsuccess");
+				
+				gui.service_GetPost(jsonTimelineArray(result), listPanel, replyPanel);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+				caught.printStackTrace();
+				System.out.println("fail");
+			}
+		});
+	}
+	
+	void logout(String session) throws Exception {
+		mHantalkService.logout(session, new AsyncCallback<Void>() {
+			
+			@Override
+			public void onSuccess(Void result) {
+				// TODO Auto-generated method stub
+				System.out.println("logout ok");
+				gui.session = null;
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				System.out.println("logout fail");
+				
 			}
 		});
 	}

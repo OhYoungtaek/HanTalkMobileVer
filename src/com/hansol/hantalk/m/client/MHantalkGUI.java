@@ -36,16 +36,15 @@ public class MHantalkGUI {
 	private int timelineIndex;
 	private boolean postingFlag = false;
 	private VerticalPanel currentPanel = null;
+	private VerticalPanel currentReplyPanel = null;
 	private String currentGroup = "home";
 	private String currentPostId = "-1";
 	private String userId;
-	private String userImageUrl="읭??";
+	
 	/* GUI widgets */
 	private DecoratorPanel loginPanel;
-	
 	private VerticalPanel headPanel;
 	private Image homeIcon, userIcon, groupIcon, logoutIcon;
-	
 	private VerticalPanel bodyPanel;
 	private TabPanel homeTabPanel;
 	private VerticalPanel inAllPanel, inManyReplyPanel, inLikeReplyPanel;
@@ -53,15 +52,20 @@ public class MHantalkGUI {
 	private VerticalPanel inUserPanel, inMyPostPanel;
 	private TabPanel groupTabPanel;
 	private VerticalPanel inAllGroupTabPanel, inMyGroupTabPanel;
-	
 	private VerticalPanel tailPanel;
 	
 	/* Data Model */
 	protected MHantalkServiceDelegate mHantalkService;
 	private int groupListIndex;
 
+	static final String WEEK_REPLY_TOP = "0";
+	static final String WEEK_LIKE_TOP = "1";
+	
+	static final String THIS_WEEK = "0";
+	static final String LAST_WEEK = "1";
+	
 	public void init(){
-		//생성
+		
 		timelineIndex = 0;
 		loginPanel = new DecoratorPanel();
 		headPanel = new VerticalPanel();
@@ -81,51 +85,10 @@ public class MHantalkGUI {
 		placeWidget();
 	}
 
-
 	public void placeWidget(){
 		setLoginPanel();
 		
-		windowWidth = Window.getClientWidth();
-		System.out.println(windowWidth);
-		
-		Window.addResizeHandler(new ResizeHandler() {
-			
-			public void onResize(ResizeEvent event) {
-//				windowWidth = Integer.toString(event.getWidth());
-//				windowHeight = Integer.toString(event.getHeight());
-				windowWidth = event.getWidth();
-//				windowHeight = event.getHeight();
-				
-				headPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-				bodyPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-				homeTabPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-				userTabPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-				groupTabPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-				tailPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inAllPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inManyReplyPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inLikeReplyPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inMyPostPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inAllGroupTabPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inMyGroupTabPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-//				inUserPanel.setSize(Integer.toString(event.getWidth()-30),"10");
-			}
-		});
-		
-		headPanel.setSize("350","10");
-		bodyPanel.setSize("350","10");
-		homeTabPanel.setSize("350","10");
-		userTabPanel.setSize("330","10");
-		groupTabPanel.setSize("330","10");
-		tailPanel.setSize("350","10");
-		inAllPanel.setSize("330","10");
-		inManyReplyPanel.setSize("330","10");
-		inLikeReplyPanel.setSize("330","10");
-		inMyPostPanel.setSize("330","10");
-		inAllGroupTabPanel.setSize("330","10");
-		inMyGroupTabPanel.setSize("330","10");
-		inUserPanel.setSize("330","10");
-		
+		bodyPanel.setStyleName("bodyPanel");
 		headPanel.setVisible(false);
 		bodyPanel.setVisible(false);
 		tailPanel.setVisible(false);
@@ -136,21 +99,17 @@ public class MHantalkGUI {
 		RootPanel.get("body").add(bodyPanel);
 		RootPanel.get("tail").add(tailPanel);
 		
-		
 	}
 	
 	public void setLoginPanel() {
-		// TODO Auto-generated method stub
 		FlexTable tempTable = new FlexTable();
 		Image image = new Image("http://hantalk.hansol.net/static/images/hans_logo.png");
 		final TextBox id = new TextBox();
 		final PasswordTextBox password = new PasswordTextBox();
 		Label loginLabel = new Label("계정 정보를 입력하세요.");
-		
+		Label loginStateLabel = new Label("");
 		
 		FlexTable loginTable = new FlexTable();
-		id.setText("karroo");
-		password.setText("111111");
 		Button login = new Button("LOGIN");
 		
 		loginTable.setText(0, 0, "ID");
@@ -161,7 +120,8 @@ public class MHantalkGUI {
 		tempTable.setWidget(0,0,image);
 		tempTable.setWidget(1,0,loginLabel);
 		tempTable.setWidget(2,0,loginTable);
-		tempTable.setWidget(3,0,login);
+		tempTable.setWidget(3,0,loginStateLabel);
+		tempTable.setWidget(4,0,login);
 		
 		loginPanel.add(tempTable);
 		
@@ -182,14 +142,15 @@ public class MHantalkGUI {
 				try {
 					mHantalkService.login(id.getValue(), password.getValue());
 					userId = id.getValue();
+					headPanel.setVisible(true);
+					bodyPanel.setVisible(true);
+					tailPanel.setVisible(true);
+					loginPanel.setVisible(false);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				headPanel.setVisible(true);
-				bodyPanel.setVisible(true);
-				tailPanel.setVisible(true);
-				loginPanel.setVisible(false);
+				
 			}
 		});
 		
@@ -246,8 +207,16 @@ public class MHantalkGUI {
 				headPanel.setVisible(false);
 				bodyPanel.setVisible(false);
 				tailPanel.setVisible(false);
-				loginPanel.setVisible(false);
-				init();
+				loginPanel.setVisible(true);
+				headPanel.clear();
+				bodyPanel.clear();
+				tailPanel.clear();
+				try {
+					mHantalkService.logout(session);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 	}
@@ -273,6 +242,7 @@ public class MHantalkGUI {
 		tailPanel.add(tail);
 	}
 	
+	
 	public void setHomeTabPanel(){
 		 
 		final VerticalPanel timelinePanel = getAllPanel();
@@ -283,11 +253,19 @@ public class MHantalkGUI {
 		
 		homeTabPanel.add(inAllPanel, "전체");
 		
-		inManyReplyPanel.add(new Label("Insert Panel 2 Here"));
-		homeTabPanel.add(inManyReplyPanel, "금주 댓글 많은 글");
+		final VerticalPanel manyReplyListPanel = new VerticalPanel();
+		final VerticalPanel manyReplyInReplyPanel = new VerticalPanel();
+	
+		inManyReplyPanel.add(manyReplyListPanel);
+		inManyReplyPanel.add(manyReplyInReplyPanel);
+		homeTabPanel.add(inManyReplyPanel, "댓글 많은 글");
 		
-		inLikeReplyPanel.add(new Label("Insert Panel 3 Here"));
-		homeTabPanel.add(inLikeReplyPanel, "금주 좋아요 많은 글");
+		final VerticalPanel manyLikeListPanel = new VerticalPanel();
+		final VerticalPanel manyLikeInReplyPanel = new VerticalPanel();
+	
+		inLikeReplyPanel.add(manyLikeListPanel);
+		inLikeReplyPanel.add(manyLikeInReplyPanel);
+		homeTabPanel.add(inLikeReplyPanel, "좋아요 많은 글");
 		
 		homeTabPanel.selectTab(0);
 		bodyPanel.add(homeTabPanel);
@@ -310,8 +288,26 @@ public class MHantalkGUI {
 						mHantalkService.getTimeline(session, "0", "10", null, timelinePanel, inReplyPanel);
 					} catch (Exception e) {
 						e.printStackTrace();
-						}
-//					}
+					}
+					
+				} else if (event.getSelectedItem() == 1){
+					manyReplyListPanel.clear();
+					manyReplyListPanel.setVisible(true);
+					manyReplyInReplyPanel.setVisible(false);
+					try {
+						mHantalkService.getChartList(session, WEEK_REPLY_TOP, THIS_WEEK, manyReplyListPanel, manyReplyInReplyPanel);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					manyLikeListPanel.clear();
+					manyLikeListPanel.setVisible(true);
+					manyLikeInReplyPanel.setVisible(false);
+					try {
+						mHantalkService.getChartList(session, WEEK_LIKE_TOP, THIS_WEEK, manyLikeListPanel, manyLikeInReplyPanel);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});	
@@ -320,20 +316,23 @@ public class MHantalkGUI {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				
 				homeTabPanel.selectTab(0);
 				timelinePanel.clear();
 				timelinePanel.add(getPostPanel(false));
 				timelinePanel.setVisible(true);
 				inReplyPanel.setVisible(false);
-				try {
-					mHantalkService.getTimeline(session, "0", "10", null, timelinePanel, inReplyPanel);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+
 			}
 		});
 	}
 	
+	private VerticalPanel getWeeklyPanel() {
+		// TODO Auto-generated method stub
+		return new VerticalPanel();
+	}
+
+
 	public void setUserTabPanel(){
 	
 		userTabPanel.add(inUserPanel, "내 정보");
@@ -364,8 +363,11 @@ public class MHantalkGUI {
 					timelineIndex = 0;
 					inUserPanel.setVisible(false);
 					inMyPostPanel.setVisible(true);
+					timelinePanel.setVisible(true);
+					inReplyPanel.setVisible(false);
 					timelinePanel.clear();
 					timelinePanel.add(getPostPanel(false));
+					
 					try {
 						mHantalkService.getUserTimeLine(session, "0", "10", timelinePanel, inReplyPanel);
 					} catch (Exception e) {
@@ -384,14 +386,11 @@ public class MHantalkGUI {
 				timelineIndex = 0;
 				inUserPanel.setVisible(false);
 				inMyPostPanel.setVisible(true);
+				timelinePanel.setVisible(true);
+				inReplyPanel.setVisible(false);
+				
 				timelinePanel.clear();
 				timelinePanel.add(getPostPanel(false));
-				try {
-					mHantalkService.getUserTimeLine(session, "0", "10", timelinePanel, inReplyPanel);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 		});
 		
@@ -401,6 +400,8 @@ public class MHantalkGUI {
 		bodyPanel.add(userTabPanel);
 	
 	}
+	
+	
 	public void setGroupTabPanel(){
 
 		final VerticalPanel allGroupListPanel = getGroupListPanel(true);
@@ -468,13 +469,7 @@ public class MHantalkGUI {
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
 				groupTabPanel.selectTab(1);
-				try {
-					mHantalkService.getUserGroupList(session, "0", "10", "true", "desc", 
-							"dt_last_post", null, false, myGroupListPanel, myTimelinePanel, myInReplyPanel);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
 			}
 		});
 		groupTabPanel.setVisible(false);
@@ -491,12 +486,6 @@ public class MHantalkGUI {
 	public HorizontalPanel getPostPanel(final boolean reply){
 		HorizontalPanel panel = new HorizontalPanel();
 		VerticalPanel postPanel = new VerticalPanel();
-		
-//		Image userImg = new Image(userImageUrl);
-//		System.out.println(">> "+ userImageUrl);
-//		userImg.setStyleName("userImage");
-//		panel.add(userImg);
-		
 		final FlowPanel buttonPanel = new FlowPanel();
 		
 		final InlineLabel numOfString = new InlineLabel("140");
@@ -531,12 +520,11 @@ public class MHantalkGUI {
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
 				postingFlag = true;
-//				postTextBox.setText("");
-//				postTextBox.setStyleName("clickedPostTextBox");
 				postTextBox.setVisible(false);
 				postTextArea.setVisible(true);
 				buttonPanel.setVisible(true);
 				numOfString.setText("140");
+				postTextArea.setFocus(true);
 			}
 		});
 		
@@ -571,9 +559,9 @@ public class MHantalkGUI {
 				} else {
 					try {
 						if (reply == true)
-							mHantalkService.post(session, currentGroup, postTextArea.getText(), currentPostId, "WEB",  currentPanel);
+							mHantalkService.post(session, currentGroup, postTextArea.getText(), currentPostId, "mobile",  currentPanel);
 						else if (reply == false)
-							mHantalkService.post(session, currentGroup, postTextArea.getText(), "-1", "WEB", currentPanel);
+							mHantalkService.post(session, currentGroup, postTextArea.getText(), "-1", "mobile", currentPanel);
 					} catch (Exception e) {
 						// TODO: handle exception
 					}
@@ -593,11 +581,6 @@ public class MHantalkGUI {
 				// TODO Auto-generated method stub
 				postingFlag = false;
 				postTextArea.setText("");
-//				if (reply == true)
-//					postTextBox.setText("댓글을 기다려요");
-//				else
-//					postTextBox.setText("나누고 싶은 Hantalk?");
-//				postTextBox.setSize(Integer.toString(windowWidth-40), "15");
 				postTextBox.setVisible(true);
 				postTextArea.setVisible(false);
 				buttonPanel.setVisible(false);
@@ -610,7 +593,6 @@ public class MHantalkGUI {
 	public VerticalPanel getGroupListPanel(final boolean all){
 		VerticalPanel tempPanel = new VerticalPanel();
 		FlowPanel topGroupIndex = new FlowPanel();
-		InlineLabel index_0 = new InlineLabel("모두");
 		InlineLabel index_1 = new InlineLabel("A-G");
 		InlineLabel index_2 = new InlineLabel("H-N");
 		InlineLabel index_3 = new InlineLabel("O-T");
@@ -619,8 +601,6 @@ public class MHantalkGUI {
 		InlineLabel index_6 = new InlineLabel("라-바");
 		InlineLabel index_7 = new InlineLabel("사-차");
 		InlineLabel index_8 = new InlineLabel("카-하");
-		topGroupIndex.add(index_0);
-		topGroupIndex.add(new InlineLabel(" | "));
 		topGroupIndex.add(index_1);
 		topGroupIndex.add(new InlineLabel(" | "));
 		topGroupIndex.add(index_2);
@@ -636,7 +616,7 @@ public class MHantalkGUI {
 		topGroupIndex.add(index_7);
 		topGroupIndex.add(new InlineLabel(" | "));
 		topGroupIndex.add(index_8);
-		tempPanel.add(topGroupIndex);
+//		tempPanel.add(topGroupIndex);
 		
 		return tempPanel;
 	}
@@ -755,6 +735,7 @@ public class MHantalkGUI {
 			HorizontalPanel timelineRowPanel = new HorizontalPanel();
 			HorizontalPanel timelineContentPanel = new HorizontalPanel();
 			FlowPanel timelineTextPanel = new FlowPanel();
+			timelineTextPanel.setStyleName("timelineTextPanel");
 			InlineLabel groupLabel = new InlineLabel();
 			if ( result.getUserGroupId().equals("0") == false && group == null)
 				groupLabel = new InlineLabel("["+result.getUserGroupName());
@@ -794,7 +775,7 @@ public class MHantalkGUI {
 					}
 				});
 			}
-			for(int j=0; j<5; j++){
+			for(int j=0; j<10; j++){
 				postTextPanel.add(postTextTable.getWidget(j, 0));
 			}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -834,7 +815,7 @@ public class MHantalkGUI {
 			nameLabel.setStyleName("blueLabel");
 			
 			timelineTextPanel.add(likeImg);
-			if ( result.getLikerVo().length() > 1)
+			if ( result.getLikerVo().length() > 0)
 				timelineTextPanel.add(likeLabel);
 			
 			if ( reply == false){
@@ -852,6 +833,7 @@ public class MHantalkGUI {
 					public void onClick(ClickEvent event) {
 						currentPostId = Integer.toString(result.getPostId());
 						currentPanel = replyPanel;
+						currentGroup = result.getUserGroupId();
 						replyPanel.clear();
 						timelinePanel.setVisible(false);
 						replyPanel.setVisible(true);				
@@ -911,6 +893,7 @@ public class MHantalkGUI {
 		HorizontalPanel timelineRowPanel = new HorizontalPanel();
 		HorizontalPanel timelineContentPanel = new HorizontalPanel();
 		FlowPanel timelineTextPanel = new FlowPanel();
+		timelineTextPanel.setStyleName("timelineTextPanel");
 		InlineLabel groupLabel = new InlineLabel();
 		InlineLabel groupLabelText = new InlineLabel();
 		if ( result.getUserGroupId().equals("0") == false && group == null){
@@ -923,6 +906,7 @@ public class MHantalkGUI {
 		FlexTable postTextTable = new FlexTable();
 		InlineLabel textLabel;
 		InlineLabel hyperlink;
+		postTextTable.setStyleName("postTable");
 		
 		String[] postTextArr = postProcess(result.getPostText());
 		String[] hyperlinkArr = getHyperlinkDir(result.getPostText());
@@ -951,13 +935,13 @@ public class MHantalkGUI {
 				}
 			});
 		}
-		for(int j=0; j<5; j++){
+		for(int j=0; j<10; j++){
 			postTextPanel.add(postTextTable.getWidget(j, 0));
 		}
 		/////////////////////////////////////////////////////////////////////////////////////
 		InlineLabel timeLabel = new InlineLabel(timeProcess(result.getTime())+", ");
 		InlineLabel viaLabel = new InlineLabel(result.getVia()+"에서 ");
-		InlineLabel likeLabel = new InlineLabel(" " + result.getLikerVo().length() + " 명이 좋아합니다. ");
+		InlineLabel likeLabel = new InlineLabel(" " + result.getLikerVo().length() + " 명이 좋아합니다.");
 		
 		/*Set Properties*/
 		timeLabel.setStyleName("greenLabel");
@@ -979,12 +963,12 @@ public class MHantalkGUI {
 			@Override
 			public void onClick(Widget sender) {
 				// TODO Auto-generated method stub
+				currentPanel = timelinePanel;
 				timelinePanel.setVisible(true);
 				if ( replyPanel != null) {
 					replyPanel.setVisible(false);
 					replyPanel.clear();
 				}
-				currentPanel.clear();
 			}
 		});
 		
@@ -1004,7 +988,9 @@ public class MHantalkGUI {
 		timelineTextPanel.add(likeImg);
 		if ( result.getLikerVo().length() > 1)
 			timelineTextPanel.add(likeLabel);
-		
+		Label back = new Label("<== 사진 클릭시 뒤로가기");
+		back.setStyleName("back");
+		timelineTextPanel.add(back);
 		VerticalPanel ver_tempPanel = new VerticalPanel();
 		Image rowBar = new Image("rowBar.gif");
 		rowBar.setStyleName("bar");
@@ -1015,31 +1001,13 @@ public class MHantalkGUI {
 		ver_tempPanel.add(rowBar);
 		tempTable.setWidget(0, 0, ver_tempPanel);
 		
-//		textLabel.addClickHandler(new ClickHandler() {
-//			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				// TODO Auto-generated method stub
-//				replyPanel.clear();
-//				currentPanel = replyPanel;
-//				try {
-//					mHantalkService.getReplyAll(session, Integer.toString(result.getPostId()), result.getReplyCount(), group, replyPanel, null );
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-		
 		try {
 			mHantalkService.getReplyAll(session, Integer.toString(result.getPostId()), result.getReplyCount(), group, replyPanel, null );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		replyPanel.add(tempTable);
-			
 	}
 
 
@@ -1186,10 +1154,61 @@ public class MHantalkGUI {
 				}
 			}
 			else{
-				str[0]="x";
+				str[i]="x";
 				break;
 			}
 		}
 		return str;
 	}
+
+	public void service_CharList(JsArray<ChartList> array, final String chart_kind, final VerticalPanel listPanel, final VerticalPanel replyPanel) {
+		// TODO Auto-generated method stub
+		final FlexTable chartListTable = new FlexTable();
+		
+		for(int i=0; i<array.length(); i++){
+			final ChartList result = array.get(i);
+			final Label countLabel = new Label();
+			HorizontalPanel listRowPanel = new HorizontalPanel();
+			Label nameLabel = new Label(result.getUserName() + " ");
+			Label postText = new Label(result.getPostText().substring(0, 12) + "...");
+			if ( chart_kind.equals(WEEK_REPLY_TOP) == true ) {
+				countLabel.setText(Integer.toString(result.getChartCount()) + "개의 댓글 ");
+			} else {
+				countLabel.setText(Integer.toString(result.getChartCount()) + "명이 좋아합니다");
+			}
+				
+			nameLabel.setStyleName("chartListNameLabel");
+			postText.setStyleName("chartListTextLabel");
+			listRowPanel.add(postText);
+			listRowPanel.add(nameLabel);
+			listRowPanel.add(countLabel);
+			Image rowBar = new Image("rowBar.gif");
+			rowBar.setStyleName("bar");
+			chartListTable.setWidget(2*i, 0, listRowPanel);
+			chartListTable.setWidget(2*i+1,0,rowBar);
+			postText.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					// TODO Auto-generated method stub
+					try {
+						mHantalkService.getPost(session, Integer.toString(result.getPostId()), listPanel, replyPanel);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		listPanel.add(chartListTable);
+	}
+
+	public void service_GetPost(JsArray<Result> array, VerticalPanel listPanel, VerticalPanel replyPanel) {
+		// TODO Auto-generated method stub
+		listPanel.setVisible(false);
+		replyPanel.setVisible(true);
+		setReplyPanel(array.get(0), null, listPanel, replyPanel);
+	}
+	
+	
 }

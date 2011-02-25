@@ -1,18 +1,17 @@
 
 .userImage { 
-	height: 5em;
-	width: 5em;
-	padding: 5px;
+	height: 4.2em;
+	width: 4em;
 }
 
 .bigUserImage{
-	height: 10em;
-	width: 10em;
+	height: 8em;
+	width: 8em;
 	padding: 5px;
 }
 .listGroupImage { 
-	height: 10em;
-	width: 10em;
+	height: 8em;
+	width: 8em;
 	padding: 5px;
 }
 
@@ -90,13 +89,15 @@
 }
 .bar{
 	width: 100%;
+	border: 1px solid lightblue;
 }
 
 .postTextBox{
-	width: 300px;
+	width: 280px;
 	border: 2px solid mediumaquamarine;
 	color: gray;
-	margin-left: 6px;
+	margin-left: 1px;
+	margin-bottom: 3px;
 }
 .postButton{
 	width: 100px;
@@ -107,7 +108,7 @@
 	border: 2px solid aliceblue;
 	cursor: pointer;
 	cursor: hand;
-	margin-left: 6px;
+	margin-left: 1px;
 }
 .postCancelButton{
 	width: 100px;
@@ -121,12 +122,30 @@
 	margin-right: 6px;
 }
 .postArea{
-	width: 300px;
+	width: 280px;
 	height: 80px;
 	border: 2px solid mediumaquamarine;
-	margin-left: 6px;
+	margin-left: 1px;
+	margin-bottom: 3px;
 }
-
+.timelineTextPanel{
+	margin-left: 7px;
+}
+.back{
+	color: red;
+	text-decoration: underline;
+}
+.chartListNameLabel{
+	margin-left: 3px;
+	margin-right: 3px;	
+	color: blue;
+}
+.chartListTextLabel{
+	cursor: pointer;
+	cursor: hand;
+	font-weight: bold;
+	}
+	
 .postLabel{
 	font-family: ±¼¸²Ã¼;
 }
@@ -142,3 +161,9 @@
 	color: blue;
 	text-decoration: underline;
 }
+table.postTable{
+	width: 90%;
+}
+.bodyPanel{
+	width: 90%;
+	}

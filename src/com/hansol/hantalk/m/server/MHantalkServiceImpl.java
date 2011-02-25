@@ -24,7 +24,7 @@ public class MHantalkServiceImpl extends RemoteServiceServlet implements MHantal
 		System.out.println(("Start.."));
 		String session="";
 		try{
-			session = getSession(id, pwd);//JSESSIONID����
+			session = getSession(id, pwd);
 			System.out.println(session);
 			if(session != null && session.trim().length() != 0){
 				System.out.println("LOGIN OK!!");
@@ -156,12 +156,10 @@ public class MHantalkServiceImpl extends RemoteServiceServlet implements MHantal
 			http.setRequestMethod("GET");
 			http.connect();			
 		}
-//		System.out.println("in request");
 		BufferedReader in = new BufferedReader(new InputStreamReader(http.getInputStream(),"UTF-8"));
 		String result = "";
 		String line = "";
 		while ((line = in.readLine()) != null) {
-//			System.out.println(line);
 			result +=line;
 		}
 //		System.out.println(result.substring(10, result.length()-1));
@@ -199,7 +197,7 @@ public class MHantalkServiceImpl extends RemoteServiceServlet implements MHantal
 		Properties param = new Properties();
 		param.put("ug_id", group);
 		param.put("parent_post_id", parent == null ? "-1" :parent);
-		param.put("via", via == null ? "WEB" : via);
+		param.put("via", "mobile");
 		param.put("profile", "0");
 		param.put("post_text", text);
 
@@ -241,11 +239,43 @@ public class MHantalkServiceImpl extends RemoteServiceServlet implements MHantal
 		BufferedReader in = new BufferedReader(new InputStreamReader(http.getInputStream()));
 		String line = "";
 		String result = "";
-//		System.out.println(content);
+		
 		while ((line = in.readLine()) != null) {
 			result +=line;
 		}
-		System.out.println(result.substring(1000, result.length()-1));	
+		
 		return result.substring(33, result.length()-1);	
+	}
+
+	@Override
+	public String getChartList(String session, String chart_kind, String period)
+			throws Exception {
+		String url = new String("http://hantalk.hansol.net/ajax/getChartList.action");
+		
+		Properties param = new Properties();
+		param.put("chart_kind", chart_kind);
+		param.put("period", period);
+		
+		return request(session, url, param);
+	}
+
+	@Override
+	public String getPost(String session, String postId) throws Exception {
+		// TODO Auto-generated method stub
+		String url = new String("http://hantalk.hansol.net/ajax/getPost.action");
+		
+		Properties param = new Properties();
+		param.put("post_id", postId);
+		System.out.println(postId);
+		return request(session, url, param);
+	}
+
+	@Override
+	public void logout(String session) throws Exception {
+		// TODO Auto-generated method stub
+		String url = new String("http://hantalk.hansol.net/j_spring_security_logout");
+		
+		Properties param = new Properties();
+		request(session, url, param);
 	}
 }

@@ -14,5 +14,9 @@ public interface MHantalkServiceAsync {
 	void getUserGroupList(String session, String offset, String length,
 			String own, String sort, String sortkey, String char_index,
 			AsyncCallback<String> callback);
+	void getChartList(String session, String chart_kind, String period, AsyncCallback<String> callback);
+	void getPost(String session, String postId, AsyncCallback<String> callback);
+	void logout(String logout, AsyncCallback<Void> callback);
+	
 	
 }
